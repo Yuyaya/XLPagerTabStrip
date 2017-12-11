@@ -149,9 +149,20 @@ open class PagerTabStripViewController: UIViewController, UIScrollViewDelegate {
     }
 
     open func moveToViewController(at index: Int, animated: Bool = true) {
-        guard isViewLoaded && currentIndex != index else {
-            preCurrentIndex = index
+        guard currentIndex != index else { return }
+
+        guard isViewLoaded, !viewControllers.isEmpty else {
+            currentIndex = index
             return
+        }
+
+        if animated {
+            preCurrentIndex = index
+        } else {
+            let step = (currentIndex < index) ? 1 : -1
+            for subindex in stride(from: currentIndex+step, through: index, by: step) {
+                containerView.setContentOffset(CGPoint(x: pageOffsetForChild(at: subindex), y: 0), animated: animated)
+            }
         }
 
         if animated && pagerBehaviour.skipIntermediateViewControllers && abs(currentIndex - index) > 1 {
@@ -162,14 +173,14 @@ open class PagerTabStripViewController: UIViewController, UIScrollViewDelegate {
             tmpViewControllers[currentIndex] = fromChildVC
             tmpViewControllers[fromIndex] = currentChildVC
             pagerTabStripChildViewControllersForScrolling = tmpViewControllers
-            containerView?.setContentOffset(CGPoint(x: pageOffsetForChild(at: fromIndex), y: 0), animated: false)
+            containerView.setContentOffset(CGPoint(x: pageOffsetForChild(at: fromIndex), y: 0), animated: false)
             (navigationController?.view ?? view).isUserInteractionEnabled = !animated
-            containerView?.setContentOffset(CGPoint(x: pageOffsetForChild(at: index), y: 0), animated: true)
+            containerView.setContentOffset(CGPoint(x: pageOffsetForChild(at: index), y: 0), animated: true)
         } else {
             (navigationController?.view ?? view).isUserInteractionEnabled = !animated
-            containerView?.setContentOffset(CGPoint(x: pageOffsetForChild(at: index), y: 0), animated: animated)
+            containerView.setContentOffset(CGPoint(x: pageOffsetForChild(at: index), y: 0), animated: animated)
         }
-    }
+}
 
     open func moveTo(viewController: UIViewController, animated: Bool = true) {
         moveToViewController(at: viewControllers.index(of: viewController)!, animated: animated)
