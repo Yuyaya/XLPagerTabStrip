@@ -158,12 +158,14 @@ open class PagerTabStripViewController: UIViewController, UIScrollViewDelegate {
 
         if animated {
             preCurrentIndex = index
-        } else {
+        }
+        // Removed for transion bug
+        /*else {
             let step = (currentIndex < index) ? 1 : -1
             for subindex in stride(from: currentIndex+step, through: index, by: step) {
                 containerView.setContentOffset(CGPoint(x: pageOffsetForChild(at: subindex), y: 0), animated: animated)
             }
-        }
+        }*/
 
         if animated && pagerBehaviour.skipIntermediateViewControllers && abs(currentIndex - index) > 1 {
             var tmpViewControllers = viewControllers
